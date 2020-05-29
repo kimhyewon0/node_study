@@ -14,6 +14,8 @@ app.use(express.static('public'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true})) //인코딩된 url
 //클라이언트와 서버가 데이터를 주고받을 때 한글이나 특수문자를 제대로 받을 수 있도록 하는 것
+app.set('view engine', 'ejs') //view engine은 ejs라는 것을 알려주는 코드
+
 
 // url 라우팅으로 get요청에 대해 응답값을 파일단위로 전송
 app.get('/', function(req, res){
@@ -33,5 +35,10 @@ app.post('/email_post', function(req, res){
     // get : req.param('email')
     // post : 이렇게해서는 받을 수 없고 콘솔을 설치해야함(body-parser)
     console.log(req.body.email)
-    res.send("post_response")
+    //res.send("hello, " + req.body.email)
+    
+    // 템플릿 엔진을 이용해서 화면에 표시하기
+    // 'express view engine'을 검색하기
+    // 응답값을 줄 때 render를 사용해서 데이터와 html이 결합 된 상태로 클라이언트에게 전달할 수 있음 
+    res.render('email.ejs', {'email' : req.body.email})
 })
