@@ -17,39 +17,27 @@ app.use(bodyParser.urlencoded({extended:true})) //인코딩된 url
 app.set('view engine', 'ejs') //view engine은 ejs라는 것을 알려주는 코드
 
 
-// url 라우팅으로 get요청에 대해 응답값을 파일단위로 전송
-app.get('/', function(req, res){
-    //res.send('<h1>hi!! send data</h1>')
-    res.sendFile(__dirname + "/public/main.html")
-})
-
-
-// localhost:3000/main 이라고 해도 페이지가 뜨게해줘!
-app.get('/main', function(req, res){
-    res.sendFile(__dirname + "/public/main.html")
-})
-
 
 //post 방식으로 파일 전송받기
-app.post('/email_post', function(req, res){
+app.post('/search_post', function(req, res){
     // get : req.param('email')
     // post : 이렇게해서는 받을 수 없고 콘솔을 설치해야함(body-parser)
-    console.log(req.body.email)
+    console.log(req.body.search)
     //res.send("hello, " + req.body.email)
     
     // 템플릿 엔진을 이용해서 화면에 표시하기
     // 'express view engine'을 검색하기
     // 응답값을 줄 때 render를 사용해서 데이터와 html이 결합 된 상태로 클라이언트에게 전달할 수 있음 
-    res.render('email.ejs', {'email' : req.body.email})
+    res.render('search.ejs', {'search' : req.body.search})
 })
 
 
 // 클라이언트에 있는 form을 json 형태로 만들어서 send로 보냈고,
 // post로 보내고 받은 정보를 '/ajax_send_email'이 url로 라우팅해서 express가 모니터링 하고 있다가
 // console 찍고 결과값을 포함하여 입력값을 잘 표현된 것을 보여주는 코드
-app.post('/ajax_send_email', function(req, res){
-    console.log(req.body.email);
+app.post('/ajax_send_search', function(req, res){
+    console.log(req.body.search);
     // input value에 대한 check validation ==> "select db"하는 것을 의미
-    var responseData = {'result' : 'ok', 'email' : req.body.email};
+    var responseData = {'result' : 'ok', 'search' : req.body.search};
     res.json(responseData)
 });

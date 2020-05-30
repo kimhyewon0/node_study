@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>search form</title>
+</head>
+<body>
+    <form action="/search_post" method="post">
+        search : <input type="text" name="search"><br/>
+        <input type="submit">
+    </form>
+    <button class="ajaxsend">찾기</button>
+    
+    <div class="result"></div>
+    
+    <script>
+        document.querySelector('.ajaxsend').addEventListener('click', function(){
+            var inputdata = document.forms[0].elements[0].value
+            sendAjax('http://127.0.0.1:3000/ajax_send_search', inputdata);
+        })
+        function sendAjax(url, data){
+            var data = {'search' : data};
+            data = JSON.stringify(data);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST',url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(data);
+            
+            xhr.addEventListener('load', function(){
+                var result = JSON.parse(xhr.responseText);
+                if (result.result !== 'ok') return;
+                document.querySelector('.result').innerHTML = result.search;
+            });
+        }
+        
+    </script>
+</body>
+</html>
