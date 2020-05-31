@@ -1,6 +1,20 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+var express = require('express')
+var app = express()
+var bodyParser = require('body-parser')
+var mysql = require('mysql')
+
+//connection 정보를 만들어서 mysql을 express를 이용하여 사용 할 수 있도록 해주는 코드 -> mysql이 이 프로젝트에 설치해줘야함
+var connection = mysql.createConnection({
+    host : 'localhost',
+    port : 3306,
+    user : 'root',
+    password : 'ghen0910',
+    database : 'userdb'
+})
+// express에서 mysql연동하여 클라이언트에 연락을 주는방법
+
+// connection 관련된 객체정보를 받는데 그게 connect함수 안에 있음
+connection.connect()
 
 app.listen(3000, function() {
 	console.log("start!!!! express server on port 3000!");
@@ -20,7 +34,8 @@ app.set('view engine', 'ejs') //view engine은 ejs라는 것을 알려주는 코
 // url 라우팅으로 get요청에 대해 응답값을 파일단위로 전송
 app.get('/', function(req, res){
     //res.send('<h1>hi!! send data</h1>')
-    res.sendFile(__dirname + "/public/main.html")
+    console.log('test');
+    res.sendFile(__dirname + "/public/main.html");
 })
 
 
@@ -44,12 +59,33 @@ app.post('/email_post', function(req, res){
 })
 
 
-// 클라이언트에 있는 form을 json 형태로 만들어서 send로 보냈고,
-// post로 보내고 받은 정보를 '/ajax_send_email'이 url로 라우팅해서 express가 모니터링 하고 있다가
-// console 찍고 결과값을 포함하여 입력값을 잘 표현된 것을 보여주는 코드
+//이메일 정보가 실제 db에 있는지 확인하고, 있으면 name을 반환
 app.post('/ajax_send_email', function(req, res){
-    console.log(req.body.email);
-    // input value에 대한 check validation ==> "select db"하는 것을 의미
-    var responseData = {'result' : 'ok', 'email' : req.body.email};
-    res.json(responseData)
+    var email = req.body.email;
+    var responseData = {};
+    
+    // 쿼리날리기 -> db 접속
+    var query = connection.query('select name from user where email="' + email + '"', function(err, rows){
+        if(err) throw err;
+        if(rows[0]){
+            //rows[0]에 데이터가 있을 경우
+            
+            //테스트용
+            console.log(rows[0]);
+            
+            responseData.result = 'ok';
+            responseData.name = rows[0].name;
+        }
+        else{
+//            console.log('none : ' + rows[0])
+            responseData.result = 'fail';
+            responseData.name = '';
+        }
+        res.json(responseData)
+        
+    })
 });
+
+//클라이언트 innerHTML로 결과값을 받아 파싱하여 넣었음
+//서버에서는 결과값을 잘 줘서 응답값을 보냈고
+//Json 형태로 데이터를 넣어서 표현하는 것을 했음
